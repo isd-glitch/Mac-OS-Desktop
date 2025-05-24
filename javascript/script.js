@@ -26,8 +26,8 @@ const calculatorApp = {
   close: document.querySelector(".close-cal"),
   backfull: document.querySelector(".min-cal"),
   point: document.querySelector("#point-cal"),
-  opening: document.querySelector('.open-cal'),
-  opening_l: document.querySelector(".open-cal-lunching")
+  opening: document.querySelector(".open-cal"),
+  opening_l: document.querySelector(".open-cal-lunching"),
 };
 
 // Notes App
@@ -41,7 +41,8 @@ const notesApp = {
   adding: document.querySelector(".adding"),
   deleting: document.querySelector(".deleting"),
   content_typing: document.querySelector(".content__typing"),
-  opening: document.querySelector(".open-note")
+  opening: document.querySelector(".open-note"),
+  notes: document.querySelector(".content__sidebar--notes"),
 };
 
 // Terminal App
@@ -54,7 +55,7 @@ const terminalApp = {
   point: document.querySelector("#point-terminal"),
   content: document.querySelector(".terminal .terminal_content"),
   taskbar: document.querySelector(".terminal .window__taskbar"),
-  opening: document.querySelector(".open-terminal")
+  opening: document.querySelector(".open-terminal"),
 };
 
 // VScode App
@@ -71,7 +72,6 @@ const vscodeApp = {
 };
 */
 
-
 // Maps App
 const mapsApp = {
   app_name: document.querySelector("#map"),
@@ -80,7 +80,7 @@ const mapsApp = {
   close: document.querySelector(".close-map"),
   backfull: document.querySelector(".backfull-map"),
   point: document.querySelector("#point-maps"),
-  opening: document.querySelector(".open-map")
+  opening: document.querySelector(".open-map"),
 };
 
 // Launchpad
@@ -90,7 +90,7 @@ const launchpad = {
   searchbox: document.querySelector(".launchpad .searchbox"),
   app_container: document.querySelector(".Apps-container"),
   point: document.querySelector("#point-launchpad"),
-  opening: document.querySelector(".open-lunchpad")
+  opening: document.querySelector(".open-lunchpad"),
 };
 
 /********** LISTENERS **********/
@@ -119,7 +119,7 @@ function handleopen_spotlight() {
 function handleAdding() {
   const create_input = document.createElement("input");
   create_input.placeholder = "Writing name";
-  notesApp.adding.append(create_input);
+  notesApp.notes.appendChild(create_input);
 }
 
 function handleDeleting() {
@@ -238,7 +238,7 @@ terminalApp.opening.addEventListener("click", () =>
   open_window(terminalApp.window, terminalApp.point, terminalApp.app_name)
 );
 notesApp.opening.addEventListener("click", () =>
-  open_window(notesApp.window , notesApp.point, notesApp.app_name)
+  open_window(notesApp.window, notesApp.point, notesApp.app_name)
 );
 calculatorApp.opening.addEventListener("click", () =>
   open_window(calculatorApp.window, calculatorApp.point, calculatorApp.app_name)
@@ -284,28 +284,24 @@ const calculatorDisplay = document.querySelector(".display");
 
 // add eventListener to each button
 calculatorButtons.forEach((button) => {
-  button.addEventListener("click", (event) =>
-    calculate(event.target.value, calculatorDisplay)
-  );
+  button.addEventListener("click", (event) => {
+    calculate(event.target.value, calculatorDisplay);
+    console.log("btn");
+  });
 });
+
+function lastNumber(value) {
+  return value.split(/[\+\-\*\/\%]/).pop();
+}
+
+const operators = ["+", "-", "*", "/", "%"];
 
 function calculate(value, display) {
   const latestChar = display.value[display.value.length - 1];
 
   const isEmpty = display.value === "0";
   const isDecimalLastOperand = lastNumber(display.value).includes(".");
-  const isNumber =
-    value === "0" ||
-    value === "1" ||
-    value === "2" ||
-    value === "3" ||
-    value === "4" ||
-    value === "5" ||
-    value === "6" ||
-    value === "7" ||
-    value === "8" ||
-    value === "9" ||
-    value === "10";
+  const isNumber = /^[0-9]$/.test(value);
 
   if (isEmpty && isNumber) {
     return (display.value = value);
@@ -333,14 +329,10 @@ function calculate(value, display) {
     case "-":
     case "+":
     case "%":
-      if (
-        latestChar === "/" ||
-        latestChar === "*" ||
-        latestChar === "-" ||
-        latestChar === "+" ||
-        latestChar === "%"
-      )
+      if (operators.includes(latestChar)) {
         return (display.value = display.value.slice(0, -1) + value);
+      }
+    // Fall through to default case
     default:
       display.value += value;
   }
@@ -387,18 +379,19 @@ function digi() {
   }
 }
 
-let terminal_line_html = $(".terminal_line").html();
+let terminal_line_html = document.querySelector(".terminal_line").outerHTML;
 let path = "~";
 let dirName;
 let dirs = ["Desktop", "Downloads", "Music", "Documents"];
 
 function init_terminal_line() {
   $(".cursor").keydown(function (e) {
-    // trap the return key being pressed
     if (e.keyCode === 13) {
+      console.log("hello");
       e.preventDefault();
-      let command = $(this).html();
+      let command = $(this).text().trim(); // Use .text() for contenteditable elements
       if (!command) return;
+
       let command_output = "zsh: command not found: " + command + "<br>";
 
       if (command.startsWith("cd ")) {
@@ -426,9 +419,9 @@ function init_terminal_line() {
 
       $(this).removeAttr("contenteditable");
       $(this).removeClass("cursor");
-      terminalApp.content
-        .append(command_output)
-        .append(terminal_line_html.replace("~", path));
+      terminalApp.content.innerHTML += command_output; // Use .innerHTML to append string content
+      let new_terminal_line_html = terminal_line_html.replace("~", path);
+      terminalApp.content.innerHTML += new_terminal_line_html;
       placeCaretAtEnd(document.querySelector(".cursor"));
       init_terminal_line();
     }
@@ -472,10 +465,10 @@ function rightClick(e) {
 }
 
 // Loading
-const load = document.getElementById("loading");
-function lockload() {
-  load.style.display = "none";
-}
+// const load = document.getElementById("loading");
+// function lockload() {
+//   load.style.display = "none";
+// }
 
 /********** Start Battery **********/
 const calculateBattery = () => {
