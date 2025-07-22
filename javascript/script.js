@@ -509,25 +509,3 @@ elements.batteryButton.addEventListener("click", () => {
 // Call the functions
 calculateBattery();
 digi();
-// script.jsに追加
-const safariApp = {
-  app_name: document.querySelector("#safari"),
-  window: document.querySelector(".safari-window"),
-  full: document.querySelector(".maximize-safari"),
-  close: document.querySelector(".close-safari"),
-  backfull: document.querySelector(".minimize-safari"),
-  point: document.querySelector("#point-safari"),
-  opening: document.querySelector(".open-safari")
-};
-
-// Safariアプリの起動処理を追加
-safariApp.opening.addEventListener("click", () =>
-  open_window(safariApp.window, safariApp.point, safariApp.app_name)
-);
-
-// ドラッグ可能にする
-$(function() {
-  $(".safari-window").draggable({
-    handle: ".window-header"
-  });
-});
